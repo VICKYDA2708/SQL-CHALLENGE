@@ -1,0 +1,23 @@
+CREATE DATABASE Online_Book_Store;
+USE Online_Book_Store;
+
+CREATE TABLE Books(
+Book_ID INT PRIMARY KEY,
+Author_Name VARCHAR(50),
+Book_Name VARCHAR(50)
+);
+
+CREATE TABLE Orders(
+Order_ID INT PRIMARY KEY,
+Custmer_Name VARCHAR(50),
+Book_ID INT,
+FOREIGN KEY (Book_ID) REFERENCES Books(Book_id)
+);
+
+ALTER TABLE Books 
+ADD COLUMN ISBN VARCHAR(50) UNIQUE;
+
+DELETE FROM Orders WHERE Order_ID <=1;
+
+TRUNCATE TABLE Orders;
+
