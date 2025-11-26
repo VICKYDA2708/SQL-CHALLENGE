@@ -1,57 +1,89 @@
-create database workshopdb;
-use workshopdb;
+CREATE DATABASE Company_DB;
+USE Company_DB;
 
-create table employees(
-employee_id int primary key,
-first_name varchar(50),
-last_name varchar(50),
-hiredate date
+CREATE TABLE Employees (
+EmpID INT PRIMARY KEY,
+EmpName VARCHAR(50),
+DepartmentID INT,
+HireDate DATE
 );
 
-insert into employees values
-(1, "nithi", "Sethu", "2024-05-15"),
-(2, "Ram", "Kavi", "2023-08-12"),
-(3, "Raj", "Sami", "2021-06-09"),
-(4, "Sira", "Ram", "2020-03-01");
-
-create table students(
-student_id int primary key,
-first_name varchar(50),
-last_name varchar(50)
+CREATE TABLE Departments (
+DepartmentID INT PRIMARY KEY,
+DepartmentName VARCHAR(50)
 );
 
-insert into students values 
-(1, "Jeya","Balu"),
-(2, "Mari", "Muthu"),
-(3, "Gomathi", "san");
+CREATE TABLE Salaries (
+SalaryID INT PRIMARY KEY,
+EmpID INT,
+SalaryAmount DECIMAL(10,2),
+PayDate DATE,
+FOREIGN KEY (EmpID) REFERENCES Employees(EmpID)
+);
 
--- STRING FUNCTIONS --
-select upper(first_name) as upperfirstname from employees;
-select lower(last_name) as lowerlastname from employees;
-select substring(first_name, 1, 3) as first3chars from employees;
-select concat(first_name, ' ', last_name) as Fullname from employees;
-    
--- DATE FUNCTIONS --
-select employee_id, first_name, hiredate, timestampdiff(year, hiredate, now()) as tenureyears from employees; 
+INSERT INTO Employees (EmpID, EmpName, DepartmentID, HireDate) VALUES
+(101, "Niths Kumar", 1, "2021-04-19"),
+(102, "Vinoth Kumar", 2, "2017-02-21"),
+(103, "Ajay Kumar", 3, "2022-03-04"),
+(104, "Arun Kumar", 4, "2012-01-13");
 
-select employee_id, first_name as "Employe Name", ROUND(DATEDIFF(now(), HireDate)/365,2) as "Tenure Years" from employees;
+SELECT * FROM Employees;
 
--- USER DEFINED FUNCTION --
+INSERT INTO Departments (DepartmentID, DepartmentName) VALUES
+(1, "HR"),
+(2, "Finance"),
+(3, "Marketing"),
+(4, "IT");
 
-DROP function if exists DisplayName;
+SELECT  * FROM Departments;
 
-DELIMITER //
+INSERT INTO Salaries (SalaryID, EmpID, SalaryAmount, PayDate) VALUES
+(1, 101, 50000, "2021-05-10"),
+(2, 102, 60000, "2021-07-14"),
+(3, 103, 45000, "2021-08-01"),
+(4, 104, 70000, "2021-09-05");
 
-CREATE function DisplayName(
-first_name varchar(50),
-last_name varchar(50)
-) 
-returns varchar(100)
-DETERMINISTIC
+SELECT *FROM Salaries;
 
+-- Stored Procedure--
+DELIMITER $$
+
+CREATE PROCEDURE GetEmpByID(IN emp_id INT)
 BEGIN
-	return concat(first_name, ' ', last_name);
-END //
-delimiter ;
+   SELECT *
+   FROM Employees
+   WHERE EmpID = emp_id;
+END $$
 
-select DisplayName(first_name, last_name) from students;
+DELIMITER $$;
+
+CALL GetEmpByID(103);
+
+-- CREATE VIEW--
+CREATE VIEW EmployeeDepView AS
+SELECT
+e.EmpName,
+d.DepartmentName
+FROM Employees e
+JOIN Departments d
+ON e.DepartmentID = d.DepartmentID;
+
+-- Complax View--
+CREATE VIEW EmployeeAllDetails AS
+SELECT
+e.EmpID,
+e.EmpName,
+d.DepartmentName,
+s.SalaryAmount,
+s.PayDate
+FROM Employees e
+JOIN Departments d 
+ON e.DepartmentID = d.DepartmentID
+JOIN Salaries s
+ON e.EmpID = s.EmployeeID;
+
+SELECT * FROM EmployeeDepView;
+SELECT * FROM EmployeeFullInfo;
+ON e.DepartmentID = d.DepartmentID
+JOIN Salaries s
+ON e.EmpID = s.EmpID;
